@@ -67,7 +67,7 @@ app.listen(PORT, () => {
 // ==================== CONFIGURATION ====================
 const CONFIG = {
   // TOKEN DARI ENVIRONMENT VARIABLES (AMAN!)
-  LIMVIP_USER_TOKEN: process.env.LIMVIP_USER_TOKEN,
+  LMVIP_USER_TOKEN: process.env.LMVIP_USER_TOKEN,
   ATVIP_USER_TOKEN: process.env.ATVIP_USER_TOKEN,
   BOT_TOKEN: process.env.BOT_TOKEN,
   LOG_CHANNEL_ID: process.env.LOG_CHANNEL_ID || '1438066297274372177',
@@ -76,18 +76,18 @@ const CONFIG = {
   QRIS_IMAGE_URL: process.env.QRIS_IMAGE_URL || 'https://cdn.discordapp.com/attachments/1440304655585247322/1442885192548352050/IMG_0331.png',
   
   MAINTENANCE: {
-    LIMVIP: process.env.LIMVIP_MAINTENANCE === 'true' || false,
+    LMVIP: process.env.LMVIP_MAINTENANCE === 'true' || false,
     ATVIP: process.env.ATVIP_MAINTENANCE === 'true' || false
   },
   
-  LIMVIP: {
-    name: 'LIMVIP',
-    emoji: '🍋',
-    allowedRoleId: process.env.LIMVIP_ROLE_ID || '1438065941240873022',
-    price: parseInt(process.env.LIMVIP_PRICE) || 25000,
+  LMVIP: {
+    name: 'LMVIP',
+    emoji: '',
+    allowedRoleId: process.env.LMVIP_ROLE_ID || '1438065941240873022',
+    price: parseInt(process.env.LMVIP_PRICE) || 25000,
     sellerServer: {
-      channelId: process.env.LIMVIP_CHANNEL_ID || '1422529696641449994',
-      messageId: process.env.LIMVIP_MESSAGE_ID || '1431928625959010375',
+      channelId: process.env.LMVIP_CHANNEL_ID || '1422529696641449994',
+      messageId: process.env.LMVIP_MESSAGE_ID || '1431928625959010375',
       buttons: {
         getScript: 'btn_getscript',
         resetHWID: 'btn_resethwid'
@@ -95,7 +95,7 @@ const CONFIG = {
       useButtonIndex: false
     },
     yourServer: {
-      channelId: process.env.LIMVIP_YOUR_CHANNEL_ID || '1438015124337332264'
+      channelId: process.env.LMVIP_YOUR_CHANNEL_ID || '1438015124337332264'
     },
     colors: {
       primary: 0x32CD32,
@@ -108,7 +108,7 @@ const CONFIG = {
   
   ATVIP: {
     name: 'ATVIP',
-    emoji: '⚛️',
+    emoji: '',
     allowedRoleId: process.env.ATVIP_ROLE_ID || '1438062437201875000',
     price: parseInt(process.env.ATVIP_PRICE) || 35000,
     sellerServer: {
@@ -134,14 +134,14 @@ const CONFIG = {
 };
 
 // Validasi token
-if (!CONFIG.LIMVIP_USER_TOKEN || !CONFIG.ATVIP_USER_TOKEN || !CONFIG.BOT_TOKEN) {
+if (!CONFIG.LMVIP_USER_TOKEN || !CONFIG.ATVIP_USER_TOKEN || !CONFIG.BOT_TOKEN) {
   console.error('❌ ERROR: Missing required tokens in environment variables!');
-  console.error('Please set: LIMVIP_USER_TOKEN, ATVIP_USER_TOKEN, BOT_TOKEN');
+  console.error('Please set: LMVIP_USER_TOKEN, ATVIP_USER_TOKEN, BOT_TOKEN');
   process.exit(1);
 }
 
 // ==================== CLIENTS ====================
-const selfbotLIMVIP = new SelfbotClient({ checkUpdate: false });
+const selfbotLMVIP = new SelfbotClient({ checkUpdate: false });
 const selfbotATVIP = new SelfbotClient({ checkUpdate: false });
 
 const bot = new BotClient({ 
@@ -155,7 +155,7 @@ const bot = new BotClient({
 
 // ==================== STATE ====================
 const state = {
-  limvip: { 
+  lmvip: { 
     waitingForResponse: false, 
     controlPanelMessage: null 
   },
@@ -212,7 +212,7 @@ async function sendActivityLog(interaction, action, config, success, errorMessag
     const statusColor = success ? config.colors.success : config.colors.error;
     
     const logEmbed = new EmbedBuilder()
-      .setTitle(`${statusEmoji} ${config.emoji} ${config.name} - ${actionName[action]}`)
+      .setTitle(`${statusEmoji} ${config.name} - ${actionName[action]}`)
       .setColor(statusColor)
       .addFields(
         {
@@ -228,7 +228,7 @@ async function sendActivityLog(interaction, action, config, success, errorMessag
           name: '📊 Action Details',
           value: [
             `**Action:** ${actionEmoji[action]} ${actionName[action]}`,
-            `**Bot:** ${config.emoji} ${config.name}`,
+            `**Bot:** ${config.name}`,
             `**Status:** ${statusEmoji} ${statusText}`
           ].join('\n'),
           inline: false
@@ -262,9 +262,9 @@ async function sendActivityLog(interaction, action, config, success, errorMessag
 
 // ==================== PANEL CREATION ====================
 async function createPanel(channel, config) {
-  const isLimvip = config.name === 'LIMVIP';
+  const isLimvip = config.name === 'LMVIP';
   const isAtvip = config.name === 'ATVIP';
-  const isMaintenance = (isLimvip && CONFIG.MAINTENANCE.LIMVIP) || (isAtvip && CONFIG.MAINTENANCE.ATVIP);
+  const isMaintenance = (isLimvip && CONFIG.MAINTENANCE.LMVIP) || (isAtvip && CONFIG.MAINTENANCE.ATVIP);
   
   if (isMaintenance) {
     return await createMaintenancePanel(channel, config);
@@ -275,7 +275,7 @@ async function createPanel(channel, config) {
 
 async function createMaintenancePanel(channel, config) {
   const embed = new EmbedBuilder()
-    .setTitle(`⚠️ ${config.emoji} ${config.name} - Under Maintenance`)
+    .setTitle(`⚠️ ${config.name} - Under Maintenance`)
     .setDescription(
       `> **🔧 System Maintenance**\n` +
       `> Service ${config.name} sedang dalam perbaikan\n\n` +
@@ -321,37 +321,25 @@ async function createMaintenancePanel(channel, config) {
 
 async function createNormalPanel(channel, config) {
   const embed = new EmbedBuilder()
-    .setTitle(`${config.emoji} ${config.name} Control Panel`)
+    .setTitle(`${config.name}`)
     .setDescription(
-      `> **Premium Script Access**\n` +
-      `> Kelola script dan HWID Anda\n\n` +
-      `**💳 Harga:** Rp ${config.price.toLocaleString('id-ID')}\n` +
-      `**📋 Status:** Online & Ready\n` +
-      `**🎯 Method:** Scan QRIS → Auto Role → Instant Access`
-    )
-    .addFields(
-      {
-        name: '📜 Get Script',
-        value: 'Download script terbaru',
-        inline: true
-      },
-      {
-        name: '⚙️ Reset HWID',
-        value: 'Reset hardware ID',
-        inline: true
-      },
-      {
-        name: '🛒 Buy Access',
-        value: 'Info pembayaran QRIS',
-        inline: true
-      }
+      `**STATUS** : **ONLINE**\n` +
+      `**SERVICE** : **ACTIVE**\n\n` +
+      `**Advanced Automation Script**\n` +
+      `Undetected & regularly updated.\n\n` +
+      `✨ **Premium Features**\n` +
+      `🎣 Autofishing (3 Mode)\n` +
+      `📦 Auto Quest\n` +
+      `💰 Auto Sell\n` +
+      `⚡ Fast & Reliable\n` +
+      `🔒 Secure Access\n\n` +
+      `🔰 **${config.name}** • Trusted Script Provider • Today at ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`
     )
     .setColor(config.colors.primary)
     .setFooter({ 
-      text: `${bot.user.username} • Scan QRIS • Auto Role`,
+      text: `${config.name} Premium Script`,
       iconURL: bot.user.displayAvatarURL()
-    })
-    .setTimestamp();
+    });
   
   const row = new ActionRowBuilder()
     .addComponents(
@@ -363,7 +351,7 @@ async function createNormalPanel(channel, config) {
       new ButtonBuilder()
         .setCustomId(`${config.name.toLowerCase()}_resethwid`)
         .setLabel('Reset HWID')
-        .setEmoji('⚙️')
+        .setEmoji('🔄')
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId(`${config.name.toLowerCase()}_buy`)
@@ -383,7 +371,7 @@ async function createNormalPanel(channel, config) {
 // ==================== BUTTON HANDLERS ====================
 async function handleBuyButton(interaction, config) {
   const embed = new EmbedBuilder()
-    .setTitle(`${config.emoji} Beli ${config.name} Premium`)
+    .setTitle(`Beli ${config.name} Premium`)
     .setDescription(
       `**💰 Harga:** Rp ${config.price.toLocaleString('id-ID')}\n\n` +
       '**📱 Cara Pembayaran:**\n' +
@@ -404,7 +392,7 @@ async function handleBuyButton(interaction, config) {
 
 async function handleHelpButton(interaction, config) {
   const embed = new EmbedBuilder()
-    .setTitle(`${config.emoji} ${config.name} - Bantuan`)
+    .setTitle(`${config.name} - Bantuan`)
     .setDescription('Panduan penggunaan control panel')
     .addFields(
       {
@@ -436,15 +424,15 @@ async function handleHelpButton(interaction, config) {
 }
 
 async function handleActionButton(interaction, action, config, stateKey) {
-  const isLimvip = config.name === 'LIMVIP';
+  const isLmvip = config.name === 'LMVIP';
   const isAtvip = config.name === 'ATVIP';
-  const isMaintenance = (isLimvip && CONFIG.MAINTENANCE.LIMVIP) || (isAtvip && CONFIG.MAINTENANCE.ATVIP);
+  const isMaintenance = (isLmvip && CONFIG.MAINTENANCE.LMVIP) || (isAtvip && CONFIG.MAINTENANCE.ATVIP);
   
   if (isMaintenance) {
     const maintenanceEmbed = new EmbedBuilder()
       .setTitle('⚠️ Service Under Maintenance')
       .setDescription(
-        `${config.emoji} **${config.name}** sedang dalam perbaikan.\n\n` +
+        `**${config.name}** sedang dalam perbaikan.\n\n` +
         'Silakan coba lagi nanti.'
       )
       .setColor(config.colors.maintenance)
@@ -465,7 +453,7 @@ async function handleActionButton(interaction, action, config, stateKey) {
       .setTitle('🔒 Access Denied')
       .setDescription(
         `**Status Akun:** ${accessStatus}\n\n` +
-        `Anda tidak memiliki akses premium untuk menggunakan ${config.emoji} **${config.name}**.\n\n` +
+        `Anda tidak memiliki akses premium untuk menggunakan **${config.name}**.\n\n` +
         `**Untuk mendapatkan akses:**\n` +
         `Klik button **🛒 Buy Access** di panel untuk scan QRIS dan dapatkan role otomatis!`
       )
@@ -484,7 +472,7 @@ async function handleActionButton(interaction, action, config, stateKey) {
   await interaction.deferReply({ ephemeral: true });
   
   try {
-    const selfbot = isLimvip ? selfbotLIMVIP : selfbotATVIP;
+    const selfbot = isLmvip ? selfbotLMVIP : selfbotATVIP;
     
     const channel = await selfbot.channels.fetch(config.sellerServer.channelId);
     const targetMessage = await channel.messages.fetch(config.sellerServer.messageId);
@@ -580,25 +568,25 @@ function buildResponseEmbeds(result, color, accessStatus) {
 }
 
 // ==================== EVENT HANDLERS ====================
-selfbotLIMVIP.on('ready', async () => {
-  logger.success(`🍋 LIMVIP Selfbot ready: ${selfbotLIMVIP.user.tag}`);
+selfbotLMVIP.on('ready', async () => {
+  logger.success(`LMVIP Selfbot ready: ${selfbotLMVIP.user.tag}`);
   
   try {
-    const limvipChannel = await selfbotLIMVIP.channels.fetch(CONFIG.LIMVIP.sellerServer.channelId);
-    await limvipChannel.messages.fetch(CONFIG.LIMVIP.sellerServer.messageId);
-    logger.success('LIMVIP initialized! 🍋');
+    const lmvipChannel = await selfbotLMVIP.channels.fetch(CONFIG.LMVIP.sellerServer.channelId);
+    await lmvipChannel.messages.fetch(CONFIG.LMVIP.sellerServer.messageId);
+    logger.success('LMVIP initialized!');
   } catch (error) {
-    logger.error(`LIMVIP init error: ${error.message}`);
+    logger.error(`LMVIP init error: ${error.message}`);
   }
 });
 
 selfbotATVIP.on('ready', async () => {
-  logger.success(`⚛️ ATVIP Selfbot ready: ${selfbotATVIP.user.tag}`);
+  logger.success(`ATVIP Selfbot ready: ${selfbotATVIP.user.tag}`);
   
   try {
     const atvipChannel = await selfbotATVIP.channels.fetch(CONFIG.ATVIP.sellerServer.channelId);
     await atvipChannel.messages.fetch(CONFIG.ATVIP.sellerServer.messageId);
-    logger.success('ATVIP initialized! ⚛️');
+    logger.success('ATVIP initialized!');
   } catch (error) {
     logger.error(`ATVIP init error: ${error.message}`);
   }
@@ -606,16 +594,16 @@ selfbotATVIP.on('ready', async () => {
 
 bot.on('ready', async () => {
   logger.success(`Bot ready: ${bot.user.tag}`);
-  logger.info(`🍋 LIMVIP: Rp ${CONFIG.LIMVIP.price.toLocaleString('id-ID')} | ${CONFIG.MAINTENANCE.LIMVIP ? 'MAINTENANCE' : 'ONLINE'}`);
-  logger.info(`⚛️ ATVIP: Rp ${CONFIG.ATVIP.price.toLocaleString('id-ID')} | ${CONFIG.MAINTENANCE.ATVIP ? 'MAINTENANCE' : 'ONLINE'}`);
-  logger.info(`📋 Log: ${CONFIG.LOG_CHANNEL_ID}`);
-  logger.info(`💳 QRIS Payment: Auto Role Enabled`);
+  logger.info(`LMVIP: Rp ${CONFIG.LMVIP.price.toLocaleString('id-ID')} | ${CONFIG.MAINTENANCE.LMVIP ? 'MAINTENANCE' : 'ONLINE'}`);
+  logger.info(`ATVIP: Rp ${CONFIG.ATVIP.price.toLocaleString('id-ID')} | ${CONFIG.MAINTENANCE.ATVIP ? 'MAINTENANCE' : 'ONLINE'}`);
+  logger.info(`Log Channel: ${CONFIG.LOG_CHANNEL_ID}`);
+  logger.info(`QRIS Payment: Auto Role Enabled`);
   
   try {
-    const limvipChannel = await bot.channels.fetch(CONFIG.LIMVIP.yourServer.channelId);
-    state.limvip.controlPanelMessage = await createPanel(limvipChannel, CONFIG.LIMVIP);
+    const lmvipChannel = await bot.channels.fetch(CONFIG.LMVIP.yourServer.channelId);
+    state.lmvip.controlPanelMessage = await createPanel(lmvipChannel, CONFIG.LMVIP);
   } catch (error) {
-    logger.error(`Failed to create LIMVIP panel: ${error.message}`);
+    logger.error(`Failed to create LMVIP panel: ${error.message}`);
   }
   
   try {
@@ -631,17 +619,17 @@ bot.on('interactionCreate', async (interaction) => {
   
   const customId = interaction.customId;
   
-  if (customId === 'limvip_getscript') {
-    await handleActionButton(interaction, 'getscript', CONFIG.LIMVIP, 'limvip');
+  if (customId === 'lmvip_getscript') {
+    await handleActionButton(interaction, 'getscript', CONFIG.LMVIP, 'lmvip');
   } 
-  else if (customId === 'limvip_resethwid') {
-    await handleActionButton(interaction, 'resethwid', CONFIG.LIMVIP, 'limvip');
+  else if (customId === 'lmvip_resethwid') {
+    await handleActionButton(interaction, 'resethwid', CONFIG.LMVIP, 'lmvip');
   }
-  else if (customId === 'limvip_buy') {
-    await handleBuyButton(interaction, CONFIG.LIMVIP);
+  else if (customId === 'lmvip_buy') {
+    await handleBuyButton(interaction, CONFIG.LMVIP);
   }
-  else if (customId === 'limvip_help') {
-    await handleHelpButton(interaction, CONFIG.LIMVIP);
+  else if (customId === 'lmvip_help') {
+    await handleHelpButton(interaction, CONFIG.LMVIP);
   }
   else if (customId === 'atvip_getscript') {
     await handleActionButton(interaction, 'getscript', CONFIG.ATVIP, 'atvip');
@@ -658,26 +646,26 @@ bot.on('interactionCreate', async (interaction) => {
 });
 
 // ==================== ERROR HANDLERS ====================
-selfbotLIMVIP.on('error', (error) => logger.error(`🍋 LIMVIP Selfbot error: ${error.message}`));
-selfbotATVIP.on('error', (error) => logger.error(`⚛️ ATVIP Selfbot error: ${error.message}`));
+selfbotLMVIP.on('error', (error) => logger.error(`LMVIP Selfbot error: ${error.message}`));
+selfbotATVIP.on('error', (error) => logger.error(`ATVIP Selfbot error: ${error.message}`));
 bot.on('error', (error) => logger.error(`Bot error: ${error.message}`));
 process.on('unhandledRejection', (error) => logger.error(`Unhandled rejection: ${error}`));
 
 // ==================== STARTUP ====================
 async function startBot() {
   try {
-    logger.info('🚀 Starting Dual Bot System with Separated User Tokens...');
+    logger.info('🚀 Starting Dual Bot System...');
     
-    logger.info('🍋 Logging in LIMVIP selfbot...');
-    await selfbotLIMVIP.login(CONFIG.LIMVIP_USER_TOKEN);
+    logger.info('Logging in LMVIP selfbot...');
+    await selfbotLMVIP.login(CONFIG.LMVIP_USER_TOKEN);
     
-    logger.info('⚛️ Logging in ATVIP selfbot...');
+    logger.info('Logging in ATVIP selfbot...');
     await selfbotATVIP.login(CONFIG.ATVIP_USER_TOKEN);
     
-    logger.info('🤖 Logging in main bot...');
+    logger.info('Logging in main bot...');
     await bot.login(CONFIG.BOT_TOKEN);
     
-    logger.success('All systems ready! 🍋⚛️💳');
+    logger.success('All systems ready!');
   } catch (error) {
     logger.error(`Startup failed: ${error.message}`);
     process.exit(1);
